@@ -753,10 +753,51 @@ module vscode =
         abstract statusBarCommands: ResizeArray<Command> option with get, set
         abstract createResourceGroup: id: string * label: string -> SourceControlResourceGroup
         abstract dispose: unit -> unit
+    
+    and [<AllowNullLiteral>] WebviewOptions =
+        abstract enableScripts: bool option with get, set
+        abstract enableCommandUris: bool option with get, set
+        abstract localResourceRoots: ReadonlyArray<Uri> option with get
+
+    type [<AllowNullLiteral>] Webview =
+        abstract options: WebviewOptions with get, set
+        abstract html: string with get, set
+        abstract onDidReceiveMessage: Event<obj option> with get, set
+        abstract postMessage: message: obj option -> Thenable<bool> 
+
+    and [<AllowNullLiteral>] WebviewPanelOptions =
+        abstract enableFindWidget: bool option
+        abstract retainContextWhenHidden: bool option
+
+    and [<AllowNullLiteral>] WebviewPanel =
+        abstract viewType: string
+        abstract title: string with get, set
+        abstract iconPath: U2<Uri, obj> option with get, set
+        abstract webview: Webview
+        abstract options: WebviewPanelOptions
+        abstract viewColumn: ViewColumn option
+        abstract active: bool
+        abstract visible: bool
+        abstract onDidChangeViewState: with get(): Event<WebviewPanelOnDidChangeViewStateEvent> = jsNative 
+        abstract onDidDispose: with get(): Event<unit> = jsNative 
+        abstract reveal: ?viewColumn: ViewColumn * ?preserveFocus: bool -> unit
+        abstract dispose: unit -> obj option
+
+    and [<AllowNullLiteral>] WebviewPanelOnDidChangeViewStateEvent =
+        abstract webviewPanel: WebviewPanel
+
+    and [<AllowNullLiteral>] WebviewPanelSerializer =
+        abstract deserializeWebviewPanel: webviewPanel: WebviewPanel * state: obj option -> Thenable<unit>
+
+    and [<AllowNullLiteral>] Clipboard =
+        abstract readText: unit -> Thenable<string>
+        abstract writeText: value: string -> Thenable<unit>
 
     type [<Import("env","vscode")>] env =
         static member appName with get(): string = jsNative and set(v: string): unit = jsNative
+        static member appRoot with get(): string = jsNative and set(v: string): unit = jsNative
         static member language with get(): string = jsNative and set(v: string): unit = jsNative
+        static member abstract with get(): clipboard: Clipboard   
         static member machineId with get(): string = jsNative and set(v: string): unit = jsNative
         static member sessionId with get(): string = jsNative and set(v: string): unit = jsNative
 
@@ -805,7 +846,9 @@ module vscode =
         static member createTerminal(?name: string, ?shellPath: string, ?shellArgs: ResizeArray<string>): Terminal = jsNative
         static member createTerminal(options: TerminalOptions): Terminal = jsNative
         static member registerTreeDataProvider(viewId: string, treeDataProvider: TreeDataProvider<'T>): Disposable = jsNative
-
+        static member createWebviewPanel: viewType: string * title: string * showOptions: U2<ViewColumn, obj> * ?options: obj -> WebviewPanel = jsNative
+        static member abstract registerWebviewPanelSerializer: viewType: string * serializer: WebviewPanelSerializer -> Disposable = jsNative
+   
     type [<Import("workspace","vscode")>] workspace =
         static member rootPath with get(): string option = jsNative and set(v: string option): unit = jsNative
         static member textDocuments with get(): ResizeArray<TextDocument> = jsNative and set(v: ResizeArray<TextDocument>): unit = jsNative
