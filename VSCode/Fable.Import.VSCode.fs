@@ -778,8 +778,8 @@ module vscode =
         abstract viewColumn: ViewColumn option
         abstract active: bool
         abstract visible: bool
-        abstract onDidChangeViewState: with get(): Event<WebviewPanelOnDidChangeViewStateEvent> = jsNative 
-        abstract onDidDispose: with get(): Event<unit> = jsNative 
+        abstract onDidChangeViewState: Event<WebviewPanelOnDidChangeViewStateEvent> 
+        abstract onDidDispose: Event<unit> with get, set
         abstract reveal: ?viewColumn: ViewColumn * ?preserveFocus: bool -> unit
         abstract dispose: unit -> obj option
 
@@ -797,7 +797,7 @@ module vscode =
         static member appName with get(): string = jsNative and set(v: string): unit = jsNative
         static member appRoot with get(): string = jsNative and set(v: string): unit = jsNative
         static member language with get(): string = jsNative and set(v: string): unit = jsNative
-        static member abstract with get(): clipboard: Clipboard   
+        static member clipboard with get(): Clipboard = jsNative
         static member machineId with get(): string = jsNative and set(v: string): unit = jsNative
         static member sessionId with get(): string = jsNative and set(v: string): unit = jsNative
 
@@ -847,7 +847,7 @@ module vscode =
         static member createTerminal(options: TerminalOptions): Terminal = jsNative
         static member registerTreeDataProvider(viewId: string, treeDataProvider: TreeDataProvider<'T>): Disposable = jsNative
         static member createWebviewPanel: viewType: string * title: string * showOptions: U2<ViewColumn, obj> * ?options: obj -> WebviewPanel = jsNative
-        static member abstract registerWebviewPanelSerializer: viewType: string * serializer: WebviewPanelSerializer -> Disposable = jsNative
+        static member registerWebviewPanelSerializer: viewType: string * serializer: WebviewPanelSerializer -> Disposable = jsNative
    
     type [<Import("workspace","vscode")>] workspace =
         static member rootPath with get(): string option = jsNative and set(v: string option): unit = jsNative
